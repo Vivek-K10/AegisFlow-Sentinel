@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AegisFlow Sentinel // Autonomous Zero-Day SOC</title>
+    <!-- Google Fonts & Chart.js -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <!-- Background Grid & Glow FX -->
+    <div class="cyber-grid"></div>
+    <div class="glow-orb glow-cyan"></div>
+    <div class="glow-orb glow-violet"></div>
+
+    <!-- Navigation Header -->
+    <header class="navbar glass-panel">
+        <div class="brand">
+            <div class="brand-symbol">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="12 2 2 7 12 22 22 7 12 2"></polygon>
+                    <polyline points="2 7 12 12 22 7"></polyline>
+                    <polyline points="12 12 12 22"></polyline>
+                </svg>
+            </div>
+            <div class="brand-text">
+                <h1 class="brand-title">AEGIS<span>FLOW</span></h1>
+                <span class="brand-tagline">AUTONOMOUS ZERO-DAY NETWORK SENTINEL // SIGNATURE-FREE BEHAVIORAL DEFENSE</span>
+            </div>
+        </div>
+
+        <div class="system-status-badge" id="systemStatusBadge">
+            <span class="status-indicator-dot pulse"></span>
+            <span class="status-label" id="systemStatusText">SENTINEL ARMED</span>
+        </div>
+
+        <div class="nav-controls">
+            <button class="btn btn-outline" id="btnOpenRetrain">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                Retrain Baseline
+            </button>
+            <button class="btn btn-outline" id="btnOpenUpload">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Upload CSV
+            </button>
+            <button class="btn btn-outline" id="btnRunBenchmark">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+                Benchmark Models
+            </button>
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        <!-- Top KPI Cards -->
+        <section class="kpi-grid">
+            <div class="kpi-card glass-panel" id="cardFlows">
+                <div class="kpi-header">
+                    <span class="kpi-title">TOTAL FLOWS ANALYZED</span>
+                    <span class="kpi-icon icon-cyan">⚡</span>
+                </div>
+                <div class="kpi-value" id="kpiTotalFlows">0</div>
+                <div class="kpi-subtitle"><span id="kpiStreamRate">0.0</span> pkts/sec streaming</div>
+            </div>
+
+            <div class="kpi-card glass-panel" id="cardIntrusions">
+                <div class="kpi-header">
+                    <span class="kpi-title">ANOMALIES INTERCEPTED</span>
+                    <span class="kpi-icon icon-crimson">🛡️</span>
+                </div>
+                <div class="kpi-value text-crimson" id="kpiFlaggedCount">0</div>
+                <div class="kpi-subtitle">Zero-day intrusions flagged</div>
+            </div>
+
+            <div class="kpi-card glass-panel" id="cardRate">
+                <div class="kpi-header">
+                    <span class="kpi-title">INTRUSION DEFENSE RATIO</span>
+                    <span class="kpi-icon icon-violet">📊</span>
+                </div>
+                <div class="kpi-value text-violet" id="kpiAnomalyRate">0.0%</div>
+                <div class="kpi-subtitle">Consensus alert density</div>
+            </div>
+
+            <div class="kpi-card glass-panel" id="cardConfidence">
+                <div class="kpi-header">
+                    <span class="kpi-title">ENSEMBLE CONSENSUS</span>
+                    <span class="kpi-icon icon-emerald">🎯</span>
+                </div>
+                <div class="kpi-value text-emerald" id="kpiEnsembleAgreement">99.4%</div>
+                <div class="kpi-subtitle">3/3 Model Cross-Validation</div>
+            </div>
+        </section>
+
+        <!-- Interactive Attack Injection Controls -->
+        <section class="simulator-strip glass-panel">
+            <div class="strip-header">
+                <div class="strip-title">
+                    <span class="strip-tag">CYBER ATTACK SIMULATOR</span>
+                    <span class="strip-desc">Inject synthetic threat flows into the live telemetry stream to evaluate zero-day anomaly response</span>
+                </div>
+                <div class="stream-toggle-box">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="streamToggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                    <span class="stream-label" id="streamLabel">AUTO-STREAM ACTIVE</span>
+                </div>
+            </div>
+            
+            <div class="threat-btn-grid">
+                <button class="threat-btn threat-benign" onclick="injectThreat('none')">
+                    <span class="threat-bullet">●</span>
+                    <span class="threat-name">Benign Traffic</span>
+                    <span class="threat-detail">HTTP/S / DNS / SSH Baseline</span>
+                </button>
+                <button class="threat-btn threat-ddos" onclick="injectThreat('ddos')">
+                    <span class="threat-bullet">●</span>
+                    <span class="threat-name">DDoS SYN Flood</span>
+                    <span class="threat-detail">High PPS, Extreme SYN/ACK</span>
+                </button>
+                <button class="threat-btn threat-scan" onclick="injectThreat('port_scan')">
+                    <span class="threat-bullet">●</span>
+                    <span class="threat-name">Port Scan Sweep</span>
+                    <span class="threat-detail">Recon, High Diff Srv, Rejections</span>
+                </button>
+                <button class="threat-btn threat-exfil" onclick="injectThreat('exfiltration')">
+                    <span class="threat-bullet">●</span>
+                    <span class="threat-name">Data Exfiltration</span>
+                    <span class="threat-detail">Massive Outbound, High Entropy</span>
+                </button>
+                <button class="threat-btn threat-c2" onclick="injectThreat('c2_beacon')">
+                    <span class="threat-bullet">●</span>
+                    <span class="threat-name">Zero-Day C2 Beacon</span>
+                    <span class="threat-detail">Zero-Jitter Stealth Cadence</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Charts Grid -->
+        <section class="charts-row">
+            <!-- Live Telemetry Score Line Chart -->
+            <div class="chart-panel glass-panel flex-2">
+                <div class="chart-header">
+                    <div class="panel-heading">
+                        <span class="pulse-cyan">●</span> LIVE ANOMALY TELEMETRY STREAM
+                    </div>
+                    <div class="legend-pills">
+                        <span class="pill pill-cyan">Ensemble</span>
+                        <span class="pill pill-violet">Iso Forest</span>
+                        <span class="pill pill-emerald">Autoencoder</span>
+                    </div>
+                </div>
+                <div class="chart-canvas-wrapper">
+                    <canvas id="telemetryChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 2D Latent Representation Scatter Plot -->
+            <div class="chart-panel glass-panel flex-1">
+                <div class="chart-header">
+                    <div class="panel-heading">
+                        <span class="pulse-violet">●</span> 2D LATENT BOTTLENECK SPACE
+                    </div>
+                    <span class="badge-sub">Autoencoder PCA Projection</span>
+                </div>
+                <div class="chart-canvas-wrapper">
+                    <canvas id="latentScatterChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Second Row: Benchmark Radar & Live Alert Feed -->
+        <section class="charts-row">
+            <!-- Algorithm Comparison Radar -->
+            <div class="chart-panel glass-panel flex-1">
+                <div class="chart-header">
+                    <div class="panel-heading">
+                        <span class="pulse-emerald">●</span> MULTI-ALGORITHM BENCHMARK
+                    </div>
+                    <span class="badge-sub">Accuracy / Precision / Recall / F1</span>
+                </div>
+                <div class="chart-canvas-wrapper">
+                    <canvas id="benchmarkRadarChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Live Telemetry Feed Table -->
+            <div class="chart-panel glass-panel flex-2 flow-table-panel">
+                <div class="chart-header">
+                    <div class="panel-heading">
+                        <span class="pulse-crimson">●</span> REAL-TIME NETWORK FLOW TELEMETRY
+                    </div>
+                    <span class="table-counter" id="tableCounter">Showing latest 25 flows</span>
+                </div>
+                <div class="flow-table-container">
+                    <table class="flow-table">
+                        <thead>
+                            <tr>
+                                <th>TIME</th>
+                                <th>FLOW TYPE</th>
+                                <th>DURATION</th>
+                                <th>SRC / DST BYTES</th>
+                                <th>PACKETS</th>
+                                <th>ANOMALY SCORE</th>
+                                <th>SEVERITY</th>
+                                <th>XAI ACTION</th>
+                            </tr>
+                        </thead>
+                        <tbody id="flowFeedBody">
+                            <!-- Dynamic stream rows inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- XAI Forensic Attribution Modal -->
+    <div class="modal-overlay" id="xaiModal">
+        <div class="modal-content glass-panel modal-lg">
+            <div class="modal-header">
+                <div class="modal-title-box">
+                    <h2 class="modal-title">EXPLAINABLE AI (XAI) ATTRIBUTION REPORT</h2>
+                    <span class="modal-subtitle" id="xaiModalSubtitle">Forensic Root Cause Analysis</span>
+                </div>
+                <button class="modal-close-btn" onclick="closeModal('xaiModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Threat Indicators Alert Banner -->
+                <div class="xai-threat-banner" id="xaiThreatBanner">
+                    <div class="threat-banner-icon">⚠️</div>
+                    <div class="threat-banner-text" id="xaiThreatText">No immediate signatures triggered.</div>
+                </div>
+
+                <div class="xai-summary-card">
+                    <span class="summary-label">FORENSIC SUMMARY:</span>
+                    <p class="summary-text" id="xaiSummaryText">Computing attribution metrics...</p>
+                </div>
+
+                <!-- Attribution Bar Chart -->
+                <div class="xai-chart-section">
+                    <h3 class="section-title">TOP FEATURE CONTRIBUTIONS TO ANOMALY SCORE</h3>
+                    <div class="xai-bars-container" id="xaiBarsContainer">
+                        <!-- Filled dynamically -->
+                    </div>
+                </div>
+
+                <!-- Full Feature Deviations Table -->
+                <div class="xai-table-section">
+                    <h3 class="section-title">FULL 14-FEATURE Z-SCORE DEVIATION MATRIX</h3>
+                    <div class="table-scroll">
+                        <table class="xai-details-table">
+                            <thead>
+                                <tr>
+                                    <th>Feature Name</th>
+                                    <th>Observed Value</th>
+                                    <th>Learned Normal Mean</th>
+                                    <th>Z-Score Deviation</th>
+                                    <th>Score Contribution</th>
+                                </tr>
+                            </thead>
+                            <tbody id="xaiDetailsBody">
+                                <!-- Filled dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeModal('xaiModal')">Close Diagnostics</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Retrain Baseline Modal -->
+    <div class="modal-overlay" id="retrainModal">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h2 class="modal-title">RETRAIN UNSUPERVISED BASELINE</h2>
+                <button class="modal-close-btn" onclick="closeModal('retrainModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="retrainForm" onsubmit="handleRetrain(event)">
+                    <div class="form-group">
+                        <label class="form-label" for="paramSampleSize">Training Sample Size (Normal Flows)</label>
+                        <input class="form-input" type="number" id="paramSampleSize" value="2500" min="500" max="10000" step="250">
+                        <span class="form-hint">Number of synthetic background flows to train unsupervised baseline.</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="paramContamination">Assumed Contamination Rate (&nu;)</label>
+                        <input class="form-input" type="number" id="paramContamination" value="0.05" min="0.01" max="0.15" step="0.01">
+                        <span class="form-hint">Outlier sensitivity threshold for Isolation Forest and One-Class SVM.</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="paramEpochs">Autoencoder Epochs</label>
+                        <input class="form-input" type="number" id="paramEpochs" value="20" min="5" max="50" step="5">
+                        <span class="form-hint">Training iterations for the 14-12-6-12-14 reconstruction autoencoder.</span>
+                    </div>
+                    <div class="training-progress-box" id="trainingProgressBox" style="display: none;">
+                        <div class="spinner"></div>
+                        <span class="progress-text">Training Isolation Forest, Deep Autoencoder & One-Class SVM...</span>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-outline" onclick="closeModal('retrainModal')">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="btnSubmitRetrain">Execute Retraining</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- CSV Upload Modal -->
+    <div class="modal-overlay" id="uploadModal">
+        <div class="modal-content glass-panel modal-lg">
+            <div class="modal-header">
+                <h2 class="modal-title">INGEST & ANALYZE NETWORK CAPTURE CSV</h2>
+                <button class="modal-close-btn" onclick="closeModal('uploadModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="drop-zone" id="dropZone" onclick="document.getElementById('csvFileInput').click()">
+                    <svg class="drop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                    <p class="drop-text">Click or Drag & Drop Network Traffic CSV File Here</p>
+                    <span class="drop-hint">Requires 14 NSL-KDD / CICIDS flow features (`duration`, `src_bytes`, etc.)</span>
+                    <input type="file" id="csvFileInput" accept=".csv" style="display: none;" onchange="handleFileSelect(event)">
+                </div>
+
+                <div id="uploadResultsArea" style="display: none; margin-top: 1.5rem;">
+                    <div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 1.5rem;">
+                        <div class="kpi-card glass-panel">
+                            <span class="kpi-title">ROWS EVALUATED</span>
+                            <div class="kpi-value" id="uploadTotalRows">0</div>
+                        </div>
+                        <div class="kpi-card glass-panel">
+                            <span class="kpi-title">ANOMALIES DETECTED</span>
+                            <div class="kpi-value text-crimson" id="uploadAnomalyCount">0</div>
+                        </div>
+                        <div class="kpi-card glass-panel">
+                            <span class="kpi-title">ANOMALY RATIO</span>
+                            <div class="kpi-value text-violet" id="uploadAnomalyRate">0%</div>
+                        </div>
+                    </div>
+                    <h3 class="section-title">CLASSIFIED FLOWS PREVIEW (FIRST 25 ROWS)</h3>
+                    <div class="flow-table-container" style="max-height: 240px;">
+                        <table class="flow-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>PROTOCOL</th>
+                                    <th>SRC BYTES</th>
+                                    <th>DST BYTES</th>
+                                    <th>SCORE</th>
+                                    <th>VERDICT</th>
+                                    <th>SEVERITY</th>
+                                </tr>
+                            </thead>
+                            <tbody id="uploadPreviewBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('uploadModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>
